@@ -1,7 +1,7 @@
 # Analyzing-Anime-Viewership
 The full data set we used for this project is available on Kaggle here, along with a full data set description: https://www.kaggle.com/azathoth42/myanimelist
 
-Although we include the files we used in this analysis.
+The Data set is quite large, so we cannot include it here.
 
 In this project we attempt to find out if the "3 Episode Rule" is commonly used.  Among Anime enthusiasts, the 3 epsiode rule states that a show should be watched for at least 3 episodes before you decide to stop watching it or not.
 
