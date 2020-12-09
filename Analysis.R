@@ -12,6 +12,9 @@
 #export data set as csv
 
 #Read in large data set with fread in the data.table package
+#uncomment the next two lines and run to install packages if necessary
+#install.packages("ggplot2")
+#install.packages("data.table")
 library(data.table)
 animu <- fread("animelists_cleaned.csv")
 
@@ -48,23 +51,63 @@ drop_data_final <- aggregate(my_watched_episodes~username,data=drop_data_final,m
 
 #generate summary statistics 
 summary(drop_data_final)
+
+#get standard deviation
 sd(drop_data_final$my_watched_episodes)
+
+#get percent that follows the 3 episode rule
 N <- nrow(drop_data_final)
 N_greater_3 <- nrow(subset(drop_data_final,my_watched_episodes >= 3))
 N_greater_3/N
-#write out data
+
+#write out data. Replace the string with the desired output location of the file.
 write.csv(drop_data_final,"~/Desktop/Portfolio Projects/Anime/Drop_Data.csv")
 
 #Visualizations with ggplot package
-install.packages("ggplot2")
 library(ggplot2)
 
 #bar chart to show where people are dropping, with what percentage of 
 #people had a median drop value at that episode number displayed above the bar.
 graph_data <- subset(drop_data_final, my_watched_episodes <= 10)
 
-ggplot(graph_data,aes(x=my_watched_episodes,label = scales::percent(prop.table(stat(count))))) + geom_bar(position="dodge",fill="red") + 
+ggplot(graph_data,aes(x=my_watched_episodes,label = scales::percent(prop.table(stat(count))))) + geom_bar(position="dodge",fill="orangered3") + 
               geom_text(stat = 'count',position = position_dodge(.9),vjust=-0.5,size=3) +
               scale_y_continuous() + labs(x = "episodes", y = "count") +
               scale_x_continuous(breaks=seq(1,10,by = 0.5))
 
+#Calculate individual percentage of 3 episode rule following
+library(plyr)
+
+#Filter data to when the rule was followed
+drop_data_grouping <- subset(final_data,select=c(username,my_watched_episodes),final_data$my_watched_episodes >= 3)
+
+#find total number of user entries
+drop_data_user_totals <- count(final_data,"username")
+
+#find count of when people followed rule
+drop_data_user_g_3 <- count(drop_data_grouping,"username")
+
+#make column names descriptive (count defaults to calling it freq)
+names(drop_data_user_totals)[2] <- "total_count"
+names(drop_data_user_g_3)[2] <- "over/equal_3_count"
+
+#merge data set, add 0's when people never followed the rule(had no entries in drop_data_g_3)
+drop_data_merge <- merge(drop_data_user_totals,drop_data_user_g_3,all=TRUE)
+drop_data_merge[is.na(drop_data_merge)] <- as.numeric(0)
+
+#calculate percentage, add to data frame
+drop_data_merge$percentage <- drop_data_merge$`over/equal_3_count`/drop_data_merge$total_count
+
+#Create groups and graph labels
+cat_labels <- c("0-10%","10-20%","20-30%","30-40%","40-50%","50-60%","60-70%","70-80%","80-90%","90-100%")
+drop_data_merge$category <- cut(drop_data_merge$percentage,breaks=10,labels=FALSE)
+drop_data_merge
+
+#create graph
+ggplot(drop_data_merge,aes(x=category,label = scales::percent(prop.table(stat(count))))) + geom_bar(position = "dodge",fill="orangered3") + 
+  scale_x_continuous(breaks=seq(1,10,by=1),labels=cat_labels) +
+  geom_text(stat = 'count',position = position_dodge(.9),vjust=-0.5,size=3) +
+  scale_y_continuous() + labs(x = "Percent of Time Following Rule", y = "count")
+
+
+#TODO: What factors effect if a show is dropped(?)
