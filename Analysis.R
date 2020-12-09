@@ -60,9 +60,6 @@ N <- nrow(drop_data_final)
 N_greater_3 <- nrow(subset(drop_data_final,my_watched_episodes >= 3))
 N_greater_3/N
 
-#write out data. Replace the string with the desired output location of the file.
-write.csv(drop_data_final,"~/Desktop/Portfolio Projects/Anime/Drop_Data.csv")
-
 #Visualizations with ggplot package
 library(ggplot2)
 
@@ -109,5 +106,12 @@ ggplot(drop_data_merge,aes(x=category,label = scales::percent(prop.table(stat(co
   geom_text(stat = 'count',position = position_dodge(.9),vjust=-0.5,size=3) +
   scale_y_continuous() + labs(x = "Percent of Time Following Rule", y = "count")
 
+#Add relevant data fields to drop_data_final for writing
+drop_data_final$total_count <- drop_data_merge$total_count
+drop_data_final$greater_than_eq_3_count <- drop_data_merge$`over/equal_3_count`
+drop_data_final$percentage <- drop_data_merge$percentage
+drop_data_final$category <- drop_data_merge$category
+#write out data. Replace the string with the desired output location of the file.
+write.csv(drop_data_final,"~/Desktop/Portfolio Projects/Anime/Drop_Data.csv")
 
 #TODO: What factors effect if a show is dropped(?)
