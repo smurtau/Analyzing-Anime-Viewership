@@ -1,0 +1,7 @@
+*.zip
+
+.Rhistory
+
+animelists_cleaned.csv
+
+AnimeList.csv
