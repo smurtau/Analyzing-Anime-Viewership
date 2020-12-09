@@ -11,10 +11,11 @@
 #Create Bar charts of counts between 1-10 episodes with percentages displayed
 #export data set as csv
 
-#Read in large data set with fread in the data.table package
 #uncomment the next two lines and run to install packages if necessary
 #install.packages("ggplot2")
 #install.packages("data.table")
+
+#Read in large data set with fread in the data.table package. This might take a few minutes depending on your machine.
 library(data.table)
 animu <- fread("animelists_cleaned.csv")
 
@@ -73,9 +74,8 @@ ggplot(graph_data,aes(x=my_watched_episodes,label = scales::percent(prop.table(s
               scale_x_continuous(breaks=seq(1,10,by = 0.5))
 
 #Calculate individual percentage of 3 episode rule following
-library(plyr)
-
 #Filter data to when the rule was followed
+library(plyr)
 drop_data_grouping <- subset(final_data,select=c(username,my_watched_episodes),final_data$my_watched_episodes >= 3)
 
 #find total number of user entries
@@ -107,11 +107,11 @@ ggplot(drop_data_merge,aes(x=category,label = scales::percent(prop.table(stat(co
   scale_y_continuous() + labs(x = "Percent of Time Following Rule", y = "count")
 
 #Add relevant data fields to drop_data_final for writing
+drop_data_median_only <- drop_data_final
 drop_data_final$total_count <- drop_data_merge$total_count
 drop_data_final$greater_than_eq_3_count <- drop_data_merge$`over/equal_3_count`
 drop_data_final$percentage <- drop_data_merge$percentage
 drop_data_final$category <- drop_data_merge$category
+
 #write out data. Replace the string with the desired output location of the file.
 write.csv(drop_data_final,"~/Desktop/Portfolio Projects/Anime/Drop_Data.csv")
-
-#TODO: What factors effect if a show is dropped(?)
